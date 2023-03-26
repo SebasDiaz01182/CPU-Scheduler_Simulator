@@ -62,9 +62,12 @@ int main(int argc, char const *argv[]) {
         }
         
         while (fgets(content,256,file) != NULL) {
+            printf(content,"\n");
+            sleep(2);
             send(sock, content, strlen(content), 0);
         }
-    
+
+        close(sock);
     
         
     }
