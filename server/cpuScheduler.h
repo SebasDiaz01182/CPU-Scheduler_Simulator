@@ -1,11 +1,13 @@
 #ifndef CPUSCHEDULER_H
 #define CPUSCHEDULER_H
-#include <stdio.h>
-#include <stdlib.h>
+#include "processNode.h"
+typedef struct CpuScheduler {
+    int inactive; //CPU inactive time
 
-void fifoAnalysis();
-void sfjAnalysis();
-void hpfoAnalysis();
-void rrAnalysis(int quantum);
+}CpuScheduler;
+void *fifoAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
+void *sjfAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
+void *hpfAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
+void *rrAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList,int quantum);
 
 #endif

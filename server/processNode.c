@@ -2,15 +2,12 @@
 #include "processNode.h"
 
 
-
-void addProcess(ProcessList *list, int burst, int arrive,int priority,int pid){
-    ProcessNode *newNode = {burst, arrive, priority, pid,-1};
-
-    if (list->firstNode == NULL){
-        list->firstNode = newNode;
+void addProcess(ProcessList *list,ProcessNode *newNode){
+    if (list->first == NULL){
+        list->first = newNode;
     }
     else{
-        ProcessNode * tmpNode = list->firstNode;
+        struct ProcessNode * tmpNode = list->first;
 
         while (tmpNode->next != NULL){
             tmpNode= tmpNode->next;
@@ -18,12 +15,15 @@ void addProcess(ProcessList *list, int burst, int arrive,int priority,int pid){
         tmpNode->next = newNode;
     }
 }
-void addProcess(ProcessNode* firstNode,ProcessNode *newNode){
-    if (list->firstNode == NULL){
-        list->firstNode = newNode;
+void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid){
+    struct ProcessNode newNodeNP = {burst, arrive, priority, pid,NULL,-1};
+    struct ProcessNode *newNode = &newNodeNP;
+
+    if (list->first == NULL){
+        list->first = newNode;
     }
     else{
-        ProcessNode * tmpNode = list->firstNode;
+        struct ProcessNode * tmpNode = list->first;
 
         while (tmpNode->next != NULL){
             tmpNode= tmpNode->next;
@@ -31,22 +31,24 @@ void addProcess(ProcessNode* firstNode,ProcessNode *newNode){
         tmpNode->next = newNode;
     }
 }
-ProcessNode * removeProcess(ProcessList *list,int pid){
-    ProcessNode * tmpNode = list->first;
-    ProcessNode * deleteNode = NULL;
+
+ProcessNode * removeProcess(ProcessList *list,ProcessNode *node){
+    struct ProcessNode * tmpNode = list->first;
+    struct ProcessNode * deleteNode = NULL;
 
     if(tmpNode == NULL){
         return NULL;
     }
-    if(tmpNode->pid == pid){
-        list->first = tmpNode->next;
+    if(tmpNode == node){
+        list->first = NULL;
         return tmpNode;
     }
     while(tmpNode->next != NULL){
-        if(tmpNode->next->pid == pid){
-            deleteNode = tmpNode->node;
+        if(tmpNode->next == node){
+            deleteNode = tmpNode->next;
 
             tmpNode->next = deleteNode->next;
+            deleteNode->next = NULL;
             return deleteNode;
         }
 
@@ -58,7 +60,7 @@ ProcessNode * getFirstProcess(ProcessList *list){
     return list->first;
 }
 ProcessNode * getSJFProcess(ProcessList *list){
-    ProcessNode * resNode = list->first;
+    struct ProcessNode * resNode = list->first;
     if(resNode == NULL){
         return NULL;
     }
@@ -66,7 +68,7 @@ ProcessNode * getSJFProcess(ProcessList *list){
         return resNode;
     }
 
-    ProcessNode * tmpNode = list->first->next;
+    struct ProcessNode * tmpNode = list->first->next;
 
     while(tmpNode != NULL){
         if(resNode->burst > tmpNode->burst){
@@ -78,7 +80,7 @@ ProcessNode * getSJFProcess(ProcessList *list){
     
 }
 ProcessNode * getHPFProcess(ProcessList *list){
-    ProcessNode * resNode = list->first;
+    struct ProcessNode * resNode = list->first;
     if(resNode == NULL){
         return NULL;
     }
@@ -86,7 +88,7 @@ ProcessNode * getHPFProcess(ProcessList *list){
         return resNode;
     }
 
-    ProcessNode * tmpNode = list->first->next;
+    struct ProcessNode * tmpNode = list->first->next;
 
     while(tmpNode != NULL){
         if(resNode->priority > tmpNode->priority){

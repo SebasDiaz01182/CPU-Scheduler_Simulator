@@ -20,10 +20,10 @@ typedef struct ProcessList {
 
 }ProcessList;
 
-void addProcess(ProcessList *list);
-void addProcess(ProcessList *list, int burst, int arrive,int priority,int pid);
+void addProcess(ProcessList *list,ProcessNode *newNode);
+void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid);
 void printList(ProcessList *list);
-ProcessNode * removeProcess(ProcessList *list,int pid);
+ProcessNode * removeProcess(ProcessList *list,ProcessNode *node);
 ProcessNode * getFirstProcess(ProcessList *list);
 ProcessNode * getSJFProcess(ProcessList *list);
 ProcessNode * getHPFProcess(ProcessList *list);

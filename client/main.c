@@ -36,7 +36,7 @@ int main(int argc, char const *argv[]) {
     }
 
     if(option == 1) {
-        while(0==0) {
+        while(1) {
             char process[256];
             int priority = random()%5+1;
             int burst = random()%5+1;
@@ -58,11 +58,12 @@ int main(int argc, char const *argv[]) {
 
         if (file == NULL) {
             printf("Error: there was an error opening the file %s\n",filename);
-            return 1;
+            return -1;
         }
         
         while (fgets(content,256,file) != NULL) {
             printf(content,"\n");
+            printf("stopping");
             sleep(2);
             send(sock, content, strlen(content), 0);
         }

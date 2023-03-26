@@ -8,12 +8,17 @@
 
 #include "processNode.h"
 #include "cpuScheduler.h"
+#include "jobParameters.h"
+#include "cpuParameters.h"
 
 
 #define PORT 8080
 
 void *threadServer(void* arg){
-    int new_socket = *(int*)arg;
+    struct JobParameters * parameters = (struct JobParameters*)arg;
+    struct ProcessList * processListP = parameters->processes;
+
+    int new_socket = parameters->socket;
     char buffer[1024] = {0};
     int valread;
 
@@ -28,7 +33,10 @@ void *threadServer(void* arg){
     }
 }
 
-void *socketConnections(){
+void *socketConnections(void* arg){
+    struct ProcessList *list = (struct ProcessList*)arg;
+    
+
     int server, new_socket, valread;
     struct sockaddr_in address;
     int opt = 1;
@@ -72,7 +80,9 @@ void *socketConnections(){
         }
         printf("Connected to server\n");
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, threadServer, &new_socket);
+        struct JobParameters jobParameters = {new_socket,list};
+        struct JobParameters * jobParametersP = &jobParameters;
+        pthread_create(&thread_id, NULL, threadServer, &jobParameters);
         //printf("After Create");
         //pthread_join(thread_id, NULL);
         printf("Thread Started\n");
@@ -86,30 +96,51 @@ void *socketConnections(){
 }
 
 int main(int argc, char const *argv[]) {
-    //create process list
-    //display menu
-    printf("Ingrese que modalidad desea utilizar \n1. FIFO\n2. SJF\n3. HPF\n4. Round Robin\n")
-    int option;
-    scanf("%d",&option);
-    if(option==1) {
+    //Variables
+    struct ProcessList processList = {NULL};
+    struct ProcessList * processListP = &processList;
 
+    struct ProcessList finishedList = {NULL};
+    struct ProcessList * finishedListP = &finishedList;
+
+    struct CpuScheduler scheduler = {0};
+    struct CpuScheduler * schedulerP = &scheduler;
+
+    struct CpuParameters cpuParameters = {schedulerP,processListP,finishedListP,0};
+    struct CpuParameters * cpuParametersP = &cpuParameters;
+
+
+    int quantum=0;
+    int option;
+    
+    //display menu
+    
+    printf("Ingrese que modalidad desea utilizar \n1. FIFO\n2. SJF\n3. HPF\n4. Round Robin\n");
+    scanf("%d",&option);
+    /*if(option==1) {
+        pthread_t threadIdCPU;
+        pthread_create(&threadIdCPU, NULL, fifoAnalysis, &cpuParametersP);
     }
     if(option==2) {
-
+        pthread_t threadIdCPU;
+        pthread_create(&threadIdCPU, NULL, sjfAnalysis, &cpuParametersP);
     }
     if(option==3){
-        printf("Ingrese el valor del quantum:\n");
-        int quantum;
-        scanf("%d",&quantum);
-
-
+        pthread_t threadIdCPU;
+        pthread_create(&threadIdCPU, NULL, hpfAnalysis, &cpuParametersP);
     }
     else{
+        printf("Ingrese el valor del quantum:\n");
+        
+        scanf("%d",&quantum);
 
-    }
+        pthread_t threadIdCPU;
+        pthread_create(&threadIdCPU, NULL, rrAnalysis, &cpuParametersP);
+
+    }*/
     //start jobscheduler
     pthread_t thread_id;
-    pthread_create(&thread_id, NULL, socketConnections, NULL);
+    pthread_create(&thread_id, NULL, socketConnections, &processList);
     pthread_join(thread_id, NULL);
     return 0;
 }
