@@ -105,3 +105,24 @@ ProcessNode * getNextProcess(ProcessList *list,ProcessNode* node){
     return node->next;
 
 }
+
+int sortByBurst(ProcessNode* nodeA, ProcessNode* nodeB) {
+    if (nodeA->burst < nodeB->burst) {
+        return -1;
+    } else if (nodeA->burst > nodeB->burst) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+int sortByPriority(ProcessNode* nodeA, ProcessNode* nodeB) {
+    if (nodeA->priority < nodeB->priority) {
+        return -1;
+    } else if (nodeA->priority > nodeB->priority) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
