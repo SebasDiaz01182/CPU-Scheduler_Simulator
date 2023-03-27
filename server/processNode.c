@@ -16,7 +16,7 @@ void addProcess(ProcessList *list,ProcessNode *newNode){
     }
 }
 void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid){
-    struct ProcessNode newNodeNP = {burst, arrive, priority, pid,NULL,-1};
+    struct ProcessNode newNodeNP = {burst, arrive, priority, pid,NULL,-1,burst};
     struct ProcessNode *newNode = &newNodeNP;
 
     if (list->first == NULL){
@@ -106,6 +106,16 @@ ProcessNode * getNextProcess(ProcessList *list,ProcessNode* node){
 
 }
 
+int getAmountItems(ProcessList *list){
+    int res = 0;
+    ProcessNode * tmpNode = list->first;
+
+    while(tmpNode != NULL){
+        res +=1;
+        tmpNode = tmpNode->next;
+    }
+    return res;
+}
 int sortByBurst(ProcessNode* nodeA, ProcessNode* nodeB) {
     if (nodeA->burst < nodeB->burst) {
         return -1;

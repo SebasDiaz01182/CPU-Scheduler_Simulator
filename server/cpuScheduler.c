@@ -1,118 +1,125 @@
 #include "cpuScheduler.h"
+#include "cpuParameters.h"
 #include "processNode.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 
-void *fifoAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList){
+void *fifoAnalysis(void *arg){
     //TODO
-    
-    int timer = 0;
+    struct CpuParameters * parameters = (struct CpuParameters*)arg;
+    struct CpuScheduler * scheduler = parameters->scheduler;
+    struct ProcessList * processList = parameters->processList;
+    struct ProcessList * finishedList = parameters->finishedList;
+    ProcessNode* node;
     while(1){
-        ProcessNode* node = getFirstProcess(processList);
+        node = getFirstProcess(processList);
         if(node == NULL){
+            scheduler->timer += 1;
             scheduler->inactive += 1;
             sleep(1);
-            printf("Empty List %d\n",timer);
+            printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            printf("Process found: %d\n",timer);
+            printf("Process found: %d\n",scheduler->timer);
             int sleepTime = node->burst;
             sleep(sleepTime);
-            timer += sleepTime;
-            node->exit = timer;
+            scheduler->timer += sleepTime;
+            node->exit = scheduler->timer;
             removeProcess(processList,node);
             addProcess(finishedList,node);
-            
         }
     }
 }
-void *sfjAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList){
+void *sjfAnalysis(void *arg){
 
-   int timer = 0;
-   ProcessNode* node = getFirstProcess(processList);
-   int processQueue = sizeof(processList) / sizeof(struct ProcessNode);
-   qsort(processList, processQueue, sizeof(struct ProcessNode), sortByBurst());
+    struct CpuParameters * parameters = (struct CpuParameters*)arg;
+    struct CpuScheduler * scheduler = parameters->scheduler;
+    struct ProcessList * processList = parameters->processList;
+    struct ProcessList * finishedList = parameters->finishedList;
 
-   while(1){
-       node = getFirstProcess(processList);
+    ProcessNode* node;
+    while(1){
+        node = getSJFProcess(processList);
         if(node == NULL){
+            scheduler->timer += 1;
             scheduler->inactive += 1;
             sleep(1);
-            printf("Empty List %d\n",timer);
+            printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            while (node != NULL) {
-                if(node->arrive <= timer){
-                    printf("Process found: %d\n",timer);
-                    int sleepTime = node->burst;
-                    sleep(sleepTime);
-                    timer += sleepTime;
-                    node->exit = timer;
-                    removeProcess(processList,node);
-                    addProcess(finishedList,node);
-                    break;
-                }
-                node = node->next;
-            }
+            printf("Process found: %d\n",scheduler->timer);
+            int sleepTime = node->burst;
+            sleep(sleepTime);
+            scheduler->timer += sleepTime;
+            node->exit = scheduler->timer;
+            removeProcess(processList,node);
+            addProcess(finishedList,node);
         }
     }
 }
-void *hpfAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList){
+void *hpfAnalysis(void *arg){
     
-    int timer = 0;
-    ProcessNode* node = getFirstProcess(processList);
-    int processQueue = sizeof(processList) / sizeof(struct ProcessNode);
-    qsort(processList, processQueue, sizeof(struct ProcessNode), sortByPriority());
+    struct CpuParameters * parameters = (struct CpuParameters*)arg;
+    struct CpuScheduler * scheduler = parameters->scheduler;
+    struct ProcessList * processList = parameters->processList;
+    struct ProcessList * finishedList = parameters->finishedList;
+
+    
+    ProcessNode* node;
 
     while(1){
-       node = getFirstProcess(processList);
+       node = getHPFProcess(processList);
         if(node == NULL){
+            scheduler->timer += 1;
             scheduler->inactive += 1;
             sleep(1);
-            printf("Empty List %d\n",timer);
+            printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            while (node != NULL) {
-                if(node->arrive <= timer){
-                    printf("Process found: %d\n",timer);
-                    int sleepTime = node->burst;
-                    sleep(sleepTime);
-                    timer += sleepTime;
-                    node->exit = timer;
-                    removeProcess(processList,node);
-                    addProcess(finishedList,node);
-                    break;
-                }
-                node = node->next;
-            }
+            printf("Process found: %d\n",scheduler->timer);
+            int sleepTime = node->burst;
+            sleep(sleepTime);
+            scheduler->timer += sleepTime;
+            node->exit = scheduler->timer;
+            removeProcess(processList,node);
+            addProcess(finishedList,node);
         }
     }
 }
-void *rrAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList,int quantum){
+void *rrAnalysis(void *arg){
     
-    int timer = 0;
+    struct CpuParameters * parameters = (struct CpuParameters*)arg;
+    struct CpuScheduler * scheduler = parameters->scheduler;
+    struct ProcessList * processList = parameters->processList;
+    struct ProcessList * finishedList = parameters->finishedList;
+    int quantum = parameters->quantum;
+    
+
+    ProcessNode* node;
     while(1){
-        ProcessNode* node = getFirstProcess(processList);
+        node = getFirstProcess(processList);
         if(node == NULL){
+            scheduler->timer += 1;
             scheduler->inactive += 1;
             sleep(1);
-            printf("Empty List %d\n",timer);
+            printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            if(node->burst> quantum){
-                printf("Process found: %d\n",timer);
+            if(node->remainingBurst > quantum){
+                printf("Process found: %d\n",scheduler->timer);
                 int sleepTime = quantum;
                 sleep(sleepTime);
-                timer += sleepTime;
+                scheduler->timer += sleepTime;
+                node->remainingBurst -= quantum;
                 //Move to next process 
             }else{
-                printf("Process found: %d\n",timer);
-                int sleepTime = node->burst;
+                printf("Process found: %d\n",scheduler->timer);
+                int sleepTime = node->remainingBurst;
                 sleep(sleepTime);
-                timer += sleepTime;
-                node->exit = timer;
+                scheduler->timer += sleepTime;
+                node->exit = scheduler->timer;
                 removeProcess(processList,node);
                 addProcess(finishedList,node);
             }

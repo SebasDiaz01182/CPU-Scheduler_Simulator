@@ -10,6 +10,7 @@ typedef struct ProcessNode {
     int pid;//pid of the process
     struct ProcessNode *next; //program counter
     int exit; //time when the process finished
+    int remainingBurst; // in case RR saved original status
 
 
 }ProcessNode;
@@ -28,4 +29,5 @@ ProcessNode * getFirstProcess(ProcessList *list);
 ProcessNode * getSJFProcess(ProcessList *list);
 ProcessNode * getHPFProcess(ProcessList *list);
 ProcessNode * getNextProcess(ProcessList *list,ProcessNode *node);
+int getAmountItems(ProcessList *list);
 #endif

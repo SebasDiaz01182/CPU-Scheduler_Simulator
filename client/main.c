@@ -66,6 +66,7 @@ int main(int argc, char const *argv[]) {
             printf("stopping");
             sleep(2);
             send(sock, content, strlen(content), 0);
+            //TODO: get process info from server
         }
 
         close(sock);

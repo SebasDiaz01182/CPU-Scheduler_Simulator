@@ -3,11 +3,11 @@
 #include "processNode.h"
 typedef struct CpuScheduler {
     int inactive; //CPU inactive time
-
+    int timer; //CPU timer
 }CpuScheduler;
-void *fifoAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
-void *sjfAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
-void *hpfAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList);
-void *rrAnalysis(CpuScheduler* scheduler,ProcessList* processList,ProcessList* finishedList,int quantum);
+void *fifoAnalysis(void *arg);
+void *sjfAnalysis(void *arg);
+void *hpfAnalysis(void *arg);
+void *rrAnalysis(void *arg);
 
 #endif

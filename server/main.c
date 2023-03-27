@@ -17,24 +17,47 @@
 void *threadServer(void* arg){
     struct JobParameters * parameters = (struct JobParameters*)arg;
     struct ProcessList * processListP = parameters->processes;
-
-    int new_socket = parameters->socket;
+    struct CpuScheduler * scheduler = parameters->scheduler;
+    int newSocket = (int)parameters->socket;
+    //int newSocket = *new_socket;
     char buffer[1024] = {0};
     int valread;
 
     while(1){
-        valread = read(new_socket, buffer, 1024);
+        printf("socket Thread: %d\n", newSocket);
+        valread = read(newSocket, buffer, 1024);
+        
         if(valread == 0){
             printf("end of socket connection %d\n", valread);
             return NULL;
 
         }
+        printf("socket\n");
         printf("%s,%d\n", buffer,valread);
+        printf("postsocket\n");
+        const char delimiter[] = "  ";
+        int burst;
+        int priority;
+        printf("asd\n");
+        burst=atoi(strtok(buffer, delimiter));
+        printf("midasd\n");
+        priority=atoi(strtok(NULL, delimiter));
+        printf("postasd\n");
+        int pidTmp = getAmountItems(processListP);
+        
+
+        addProcessP(processListP, burst, scheduler->timer, priority, pidTmp);
+        //send confirmation
+
+        
     }
 }
 
 void *socketConnections(void* arg){
-    struct ProcessList *list = (struct ProcessList*)arg;
+    //struct ProcessList *list = (struct ProcessList*)arg;
+
+    struct JobParameters * parameters = (struct JobParameters*)arg;
+    struct ProcessList * list = parameters->processes;
     
 
     int server, new_socket, valread;
@@ -80,9 +103,12 @@ void *socketConnections(void* arg){
         }
         printf("Connected to server\n");
         pthread_t thread_id;
-        struct JobParameters jobParameters = {new_socket,list};
-        struct JobParameters * jobParametersP = &jobParameters;
-        pthread_create(&thread_id, NULL, threadServer, &jobParameters);
+        struct JobParameters jobParametersThread = {new_socket,list,parameters->scheduler};
+        struct JobParameters * jobParametersThreadP = &jobParametersThread;
+
+        printf("socket Create: %d\n", new_socket);
+        printf("socketPointer Create: %d\n", jobParametersThreadP->socket);
+        pthread_create(&thread_id, NULL, threadServer, jobParametersThreadP);
         //printf("After Create");
         //pthread_join(thread_id, NULL);
         printf("Thread Started\n");
@@ -103,12 +129,14 @@ int main(int argc, char const *argv[]) {
     struct ProcessList finishedList = {NULL};
     struct ProcessList * finishedListP = &finishedList;
 
-    struct CpuScheduler scheduler = {0};
+    struct CpuScheduler scheduler = {0,0};
     struct CpuScheduler * schedulerP = &scheduler;
 
     struct CpuParameters cpuParameters = {schedulerP,processListP,finishedListP,0};
     struct CpuParameters * cpuParametersP = &cpuParameters;
-
+    
+    struct JobParameters jobParameters = {0,finishedListP,schedulerP};
+    struct JobParameters * jobParametersP = &jobParameters;
 
     int quantum=0;
     int option;
@@ -117,17 +145,17 @@ int main(int argc, char const *argv[]) {
     
     printf("Ingrese que modalidad desea utilizar \n1. FIFO\n2. SJF\n3. HPF\n4. Round Robin\n");
     scanf("%d",&option);
-    /*if(option==1) {
+    if(option==1) {
         pthread_t threadIdCPU;
-        pthread_create(&threadIdCPU, NULL, fifoAnalysis, &cpuParametersP);
+        pthread_create(&threadIdCPU, NULL, fifoAnalysis, cpuParametersP);
     }
-    if(option==2) {
+    else if(option==2) {
         pthread_t threadIdCPU;
-        pthread_create(&threadIdCPU, NULL, sjfAnalysis, &cpuParametersP);
+        pthread_create(&threadIdCPU, NULL, sjfAnalysis, cpuParametersP);
     }
-    if(option==3){
+    else if(option==3){
         pthread_t threadIdCPU;
-        pthread_create(&threadIdCPU, NULL, hpfAnalysis, &cpuParametersP);
+        pthread_create(&threadIdCPU, NULL, hpfAnalysis, cpuParametersP);
     }
     else{
         printf("Ingrese el valor del quantum:\n");
@@ -135,12 +163,24 @@ int main(int argc, char const *argv[]) {
         scanf("%d",&quantum);
 
         pthread_t threadIdCPU;
-        pthread_create(&threadIdCPU, NULL, rrAnalysis, &cpuParametersP);
+        pthread_create(&threadIdCPU, NULL, rrAnalysis, cpuParametersP);
 
-    }*/
+    }
     //start jobscheduler
     pthread_t thread_id;
-    pthread_create(&thread_id, NULL, socketConnections, &processList);
+    pthread_create(&thread_id, NULL, socketConnections, jobParametersP);
+    //TODO posible scanf para recibir el comando de reporte o de terminacion de la ejecucion.
+    /*while(1){
+        int command;
+        scanf("%d",&command);
+        if(command == 1){
+            //print tabla
+        }else{
+
+            //stop simulation y print tabla
+            return 0;
+        }
+    }*/
     pthread_join(thread_id, NULL);
     return 0;
 }
