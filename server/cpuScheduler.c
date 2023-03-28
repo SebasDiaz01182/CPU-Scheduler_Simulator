@@ -25,7 +25,7 @@ void *fifoAnalysis(void *arg){
             printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            
+            printf("Proceso PID %d Burst %d Priority %d entra en ejecucion\n",node->pid,node->burst,node->priority);
             int sleepTime = node->burst;
             while(sleepTime > 0){
                 scheduler->timer +=1;
@@ -36,7 +36,7 @@ void *fifoAnalysis(void *arg){
             removeProcess(processList,node);
             addProcess(finishedList,node);
             //fix arrive time
-            
+            printf("Proceso terminado PID %d Burst %d Priority %d \n",node->pid,node->burst,node->priority);
             
             node = NULL;
         }
@@ -59,7 +59,7 @@ void *sjfAnalysis(void *arg){
             printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            printf("Process found: %d\n",scheduler->timer);
+            printf("Proceso PID %d Burst %d Priority %d entra en ejecucion\n",node->pid,node->burst,node->priority);
             int sleepTime = node->burst;
             while(sleepTime > 0){
                 scheduler->timer +=1;
@@ -69,6 +69,7 @@ void *sjfAnalysis(void *arg){
             node->exit = scheduler->timer;
             removeProcess(processList,node);
             addProcess(finishedList,node);
+            printf("Proceso terminado PID %d Burst %d Priority %d \n",node->pid,node->burst,node->priority);
         }
     }
 }
@@ -91,7 +92,7 @@ void *hpfAnalysis(void *arg){
             printf("Empty List %d\n",scheduler->timer);
         }
         else{
-            printf("Process found: %d\n",scheduler->timer);
+            printf("Proceso PID %d Burst %d Priority %d entra en ejecucion\n",node->pid,node->burst,node->priority);
             int sleepTime = node->burst;
             while(sleepTime > 0){
                 scheduler->timer +=1;
@@ -101,6 +102,7 @@ void *hpfAnalysis(void *arg){
             node->exit = scheduler->timer;
             removeProcess(processList,node);
             addProcess(finishedList,node);
+            printf("Proceso terminado PID %d Burst %d Priority %d \n",node->pid,node->burst,node->priority);
         }
     }
 }
@@ -124,7 +126,7 @@ void *rrAnalysis(void *arg){
         }
         else{
             if(node->remainingBurst > quantum){
-                printf("Process found: %d\n",scheduler->timer);
+                printf("Proceso PID %d Burst %d Priority %d entra en ejecucion\n",node->pid,node->burst,node->priority);
                 int sleepTime = quantum;
                 while(sleepTime > 0){
                     scheduler->timer +=1;
@@ -132,9 +134,10 @@ void *rrAnalysis(void *arg){
                     sleepTime -=1;
                 }
                 node->remainingBurst -= quantum;
+                printf("Proceso PID %d Burst %d Priority %d mantiene un burst de %d\n",node->pid,node->burst,node->priority,node->remainingBurst);
                 //Move to next process 
             }else{
-                printf("Process found: %d\n",scheduler->timer);
+                printf("Proceso PID %d Burst %d Priority %d entra en ejecucion\n",node->pid,node->burst,node->priority);
                 int sleepTime = node->remainingBurst;
                 while(sleepTime > 0){
                     scheduler->timer +=1;
@@ -144,6 +147,7 @@ void *rrAnalysis(void *arg){
                 node->exit = scheduler->timer;
                 removeProcess(processList,node);
                 addProcess(finishedList,node);
+                printf("Proceso terminado PID %d Burst %d Priority %d \n",node->pid,node->burst,node->priority);
             }
             
         }
@@ -162,7 +166,7 @@ void getReport(ProcessList *list, CpuScheduler * scheduler){
         WTTotal += WTTmp;
         TATTotal += TATTmp;
 
-        printf("pid: %d Burst: %d Llegada: %d Salida: %d TAT: %d WT: %d\n",nodeTmp->pid,nodeTmp->burst,nodeTmp->arrive,nodeTmp->exit,TATTmp,WTTmp);
+        printf("pid: %d Priority: %d Burst: %d Llegada: %d Salida: %d TAT: %d WT: %d\n",nodeTmp->pid,nodeTmp->priority,nodeTmp->burst,nodeTmp->arrive,nodeTmp->exit,TATTmp,WTTmp);
         nodeTmp = nodeTmp->next;
     }
     WTAvg = WTTotal/totalProcesses;

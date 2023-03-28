@@ -48,8 +48,12 @@ void *threadServer(void* arg){
         
         int pidTmp = getAmountItems(processListP)+getAmountItems(finishedProcessListP);
         
-        printf("timer %d\n", scheduler->timer);
+        
         addProcessP(processListP, burst, scheduler->timer, priority, pidTmp);
+        char recievedMsg[256];
+
+        sprintf(recievedMsg,"Se recibio el proceso PID %d Burst %d Priority %d",pidTmp,burst,priority);
+        send(newSocket,recievedMsg,strlen(recievedMsg),0);
         //send confirmation
 
         
@@ -164,7 +168,7 @@ int main(int argc, char const *argv[]) {
         printf("Ingrese el valor del quantum:\n");
         
         scanf("%d",&quantum);
-
+        cpuParametersP->quantum = (int)quantum;
         pthread_t threadIdCPU;
         pthread_create(&threadIdCPU, NULL, rrAnalysis, cpuParametersP);
 

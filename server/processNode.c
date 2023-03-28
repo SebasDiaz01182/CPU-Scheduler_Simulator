@@ -40,8 +40,9 @@ void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid){
 void printList(ProcessList *list){
 
     ProcessNode * tmpNode = list->first;
+    printf("Ready Queue:\n");
     while (tmpNode != NULL){
-        printf("BURST: %d PRIORITY: %d \n",tmpNode->burst,tmpNode->priority);
+        printf("PID: %d BURST: %d PRIORITY: %d \n",tmpNode->pid,tmpNode->burst,tmpNode->priority);
         tmpNode = tmpNode->next;
     }
 }
@@ -119,7 +120,7 @@ ProcessNode * getNextProcess(ProcessList *list,ProcessNode* node){
     if(node == NULL){
         return list->first;
     }
-    if(node->next !=NULL){
+    if(node->next ==NULL){
         return list->first;
     }
     return node->next;

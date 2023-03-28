@@ -36,13 +36,26 @@ int main(int argc, char const *argv[]) {
     }
 
     if(option == 1) {
+        sleep(2);
         while(1) {
             char process[256];
             int priority = random()%5+1;
-            int burst = random()%5+1;
+            
+            int minBurst,maxBurst,creationRate;
+            printf("Ingrese el minimo de burst:\n");
+            scanf("%d", &minBurst);
+            printf("Ingrese el maximo de burst:\n");
+            scanf("%d", &maxBurst);
+            printf("Ingrese la taza de creacion:\n");
+            scanf("%d",&creationRate);
+
+
+            int burst = random()%(maxBurst-minBurst+1)+minBurst;
+
             sprintf(process,"%d     %d",priority,burst);
             send(sock, process, strlen(process), 0);
-            sleep(2);
+            
+            sleep(creationRate);
         }
     }
     else{
@@ -66,6 +79,11 @@ int main(int argc, char const *argv[]) {
             
             send(sock, content, strlen(content), 0);
             int rand = (int)random()%6+3;
+            valread = read(sock, buffer, 256);
+            if(valread < 0){
+                close(sock);
+            }
+            printf("%s\n",buffer);
             sleep(1);
             //TODO: get process info from server
         }
