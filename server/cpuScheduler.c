@@ -159,7 +159,7 @@ void getReport(ProcessList *list, CpuScheduler * scheduler){
     printf("Procesos ejecutados: %d\n", totalProcesses);
     printf("Tiempo CPU Ocioso: %d\n", scheduler->inactive);
     float WTAvg,TATAvg;
-    int WTTotal = 0, TATTotal = 0;
+    float WTTotal = 0, TATTotal = 0;
     while (nodeTmp != NULL) {
         int TATTmp = nodeTmp->exit-nodeTmp->arrive;
         int WTTmp = TATTmp - nodeTmp->burst;
