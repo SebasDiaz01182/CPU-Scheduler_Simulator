@@ -16,8 +16,13 @@ void addProcess(ProcessList *list,ProcessNode *newNode){
     }
 }
 void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid){
-    struct ProcessNode newNodeNP = {burst, arrive, priority, pid,NULL,-1,burst};
-    struct ProcessNode *newNode = &newNodeNP;
+    ProcessNode *newNode = (ProcessNode *) malloc(sizeof(ProcessNode));
+    newNode->burst = burst;
+    newNode->arrive = arrive; 
+    newNode->priority = priority;
+    newNode->pid = pid; 
+    newNode->next = NULL; 
+    newNode->remainingBurst = burst; 
 
     if (list->first == NULL){
         list->first = newNode;
@@ -32,17 +37,29 @@ void addProcessP(ProcessList *list, int burst, int arrive,int priority,int pid){
     }
 }
 
+void printList(ProcessList *list){
+
+    ProcessNode * tmpNode = list->first;
+    while (tmpNode != NULL){
+        printf("BURST: %d PRIORITY: %d \n",tmpNode->burst,tmpNode->priority);
+        tmpNode = tmpNode->next;
+    }
+}
+
 ProcessNode * removeProcess(ProcessList *list,ProcessNode *node){
     struct ProcessNode * tmpNode = list->first;
     struct ProcessNode * deleteNode = NULL;
-
+    
     if(tmpNode == NULL){
         return NULL;
     }
     if(tmpNode == node){
-        list->first = NULL;
+        
+        list->first = list->first->next;
+        tmpNode->next = NULL;
         return tmpNode;
     }
+    
     while(tmpNode->next != NULL){
         if(tmpNode->next == node){
             deleteNode = tmpNode->next;
@@ -99,6 +116,9 @@ ProcessNode * getHPFProcess(ProcessList *list){
     return resNode;
 }
 ProcessNode * getNextProcess(ProcessList *list,ProcessNode* node){
+    if(node == NULL){
+        return list->first;
+    }
     if(node->next !=NULL){
         return list->first;
     }
@@ -111,28 +131,11 @@ int getAmountItems(ProcessList *list){
     ProcessNode * tmpNode = list->first;
 
     while(tmpNode != NULL){
+        
         res +=1;
         tmpNode = tmpNode->next;
     }
     return res;
 }
-int sortByBurst(ProcessNode* nodeA, ProcessNode* nodeB) {
-    if (nodeA->burst < nodeB->burst) {
-        return -1;
-    } else if (nodeA->burst > nodeB->burst) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
 
 
-int sortByPriority(ProcessNode* nodeA, ProcessNode* nodeB) {
-    if (nodeA->priority < nodeB->priority) {
-        return -1;
-    } else if (nodeA->priority > nodeB->priority) {
-        return 1;
-    } else {
-        return 0;
-    }
-}

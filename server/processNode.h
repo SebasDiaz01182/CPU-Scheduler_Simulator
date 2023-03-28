@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 typedef struct ProcessNode {
     int burst; //burst values of a process
     int arrive; //moment when the process is ready
@@ -30,4 +31,6 @@ ProcessNode * getSJFProcess(ProcessList *list);
 ProcessNode * getHPFProcess(ProcessList *list);
 ProcessNode * getNextProcess(ProcessList *list,ProcessNode *node);
 int getAmountItems(ProcessList *list);
+
+
 #endif

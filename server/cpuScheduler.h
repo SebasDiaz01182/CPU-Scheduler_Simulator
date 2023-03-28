@@ -9,5 +9,6 @@ void *fifoAnalysis(void *arg);
 void *sjfAnalysis(void *arg);
 void *hpfAnalysis(void *arg);
 void *rrAnalysis(void *arg);
+void getReport(ProcessList *list,CpuScheduler *scheduler);
 
 #endif

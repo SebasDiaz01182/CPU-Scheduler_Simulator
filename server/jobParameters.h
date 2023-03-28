@@ -5,7 +5,7 @@ typedef struct JobParameters {
     int socket; //server socket
     struct ProcessList * processes; //list of processes
     struct CpuScheduler * scheduler; //cpu scheduler
-
+    struct ProcessList * finishedProcesses;
 }jobParameters;
 
 #endif

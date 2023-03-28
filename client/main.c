@@ -60,12 +60,13 @@ int main(int argc, char const *argv[]) {
             printf("Error: there was an error opening the file %s\n",filename);
             return -1;
         }
-        
+        sleep(2);
         while (fgets(content,256,file) != NULL) {
-            printf(content,"\n");
-            printf("stopping");
-            sleep(2);
+            
+            
             send(sock, content, strlen(content), 0);
+            int rand = (int)random()%6+3;
+            sleep(1);
             //TODO: get process info from server
         }
 

@@ -17,14 +17,17 @@
 void *threadServer(void* arg){
     struct JobParameters * parameters = (struct JobParameters*)arg;
     struct ProcessList * processListP = parameters->processes;
+    struct ProcessList * finishedProcessListP = parameters->finishedProcesses;
     struct CpuScheduler * scheduler = parameters->scheduler;
     int newSocket = (int)parameters->socket;
-    //int newSocket = *new_socket;
+    
+    
+
     char buffer[1024] = {0};
     int valread;
 
     while(1){
-        printf("socket Thread: %d\n", newSocket);
+        
         valread = read(newSocket, buffer, 1024);
         
         if(valread == 0){
@@ -32,20 +35,20 @@ void *threadServer(void* arg){
             return NULL;
 
         }
-        printf("socket\n");
-        printf("%s,%d\n", buffer,valread);
-        printf("postsocket\n");
+       
+        
+        
         const char delimiter[] = "  ";
         int burst;
         int priority;
-        printf("asd\n");
-        burst=atoi(strtok(buffer, delimiter));
-        printf("midasd\n");
-        priority=atoi(strtok(NULL, delimiter));
-        printf("postasd\n");
-        int pidTmp = getAmountItems(processListP);
         
-
+        burst=atoi(strtok(buffer, delimiter));
+        
+        priority=atoi(strtok(NULL, delimiter));
+        
+        int pidTmp = getAmountItems(processListP)+getAmountItems(finishedProcessListP);
+        
+        printf("timer %d\n", scheduler->timer);
         addProcessP(processListP, burst, scheduler->timer, priority, pidTmp);
         //send confirmation
 
@@ -58,6 +61,7 @@ void *socketConnections(void* arg){
 
     struct JobParameters * parameters = (struct JobParameters*)arg;
     struct ProcessList * list = parameters->processes;
+    struct ProcessList * finishedList = parameters->finishedProcesses;
     
 
     int server, new_socket, valread;
@@ -95,23 +99,22 @@ void *socketConnections(void* arg){
             perror("listen");
             exit(EXIT_FAILURE);
         }
-        printf("Waiting for connections\n");
+        //printf("Waiting for connections\n");
         new_socket = accept(server, (struct sockaddr *)&address, (socklen_t*)&addrlen);
         if (new_socket<0) {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-        printf("Connected to server\n");
+        //printf("Connected to server\n");
         pthread_t thread_id;
-        struct JobParameters jobParametersThread = {new_socket,list,parameters->scheduler};
+        struct JobParameters jobParametersThread = {new_socket,list,parameters->scheduler,finishedList};
         struct JobParameters * jobParametersThreadP = &jobParametersThread;
 
-        printf("socket Create: %d\n", new_socket);
-        printf("socketPointer Create: %d\n", jobParametersThreadP->socket);
+        
         pthread_create(&thread_id, NULL, threadServer, jobParametersThreadP);
         //printf("After Create");
         //pthread_join(thread_id, NULL);
-        printf("Thread Started\n");
+        
     }
     // Accept connections from clients and send response
     
@@ -135,7 +138,7 @@ int main(int argc, char const *argv[]) {
     struct CpuParameters cpuParameters = {schedulerP,processListP,finishedListP,0};
     struct CpuParameters * cpuParametersP = &cpuParameters;
     
-    struct JobParameters jobParameters = {0,finishedListP,schedulerP};
+    struct JobParameters jobParameters = {0,processListP,schedulerP,finishedListP};
     struct JobParameters * jobParametersP = &jobParameters;
 
     int quantum=0;
@@ -170,17 +173,17 @@ int main(int argc, char const *argv[]) {
     pthread_t thread_id;
     pthread_create(&thread_id, NULL, socketConnections, jobParametersP);
     //TODO posible scanf para recibir el comando de reporte o de terminacion de la ejecucion.
-    /*while(1){
+    while(1){
         int command;
         scanf("%d",&command);
         if(command == 1){
-            //print tabla
+            printList(processListP);
         }else{
 
-            //stop simulation y print tabla
+            getReport(finishedListP,schedulerP);
             return 0;
         }
-    }*/
+    }
     pthread_join(thread_id, NULL);
     return 0;
 }
