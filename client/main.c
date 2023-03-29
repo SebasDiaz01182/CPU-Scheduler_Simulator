@@ -55,6 +55,7 @@ int main(int argc, char const *argv[]) {
 
             sprintf(process,"%d     %d",priority,burst);
             send(sock, process, strlen(process), 0);
+            memset(buffer, '\0', strlen(buffer));
             valread = read(sock, buffer, 256);
             printf("%s\n",buffer);
             sleep(creationRate);
@@ -81,6 +82,7 @@ int main(int argc, char const *argv[]) {
             
             send(sock, content, strlen(content), 0);
             int rand = (int)random()%6+3;
+            memset(buffer, '\0', strlen(buffer));
             valread = read(sock, buffer, 256);
             if(valread < 0){
                 close(sock);

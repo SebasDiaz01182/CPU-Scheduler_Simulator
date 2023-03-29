@@ -31,7 +31,7 @@ void *threadServer(void* arg){
         valread = read(newSocket, buffer, 1024);
         
         if(valread == 0){
-            printf("end of socket connection %d\n", valread);
+            printf("Cliente desconectado %d\n", valread);
             return NULL;
 
         }
